@@ -27,4 +27,15 @@ class Cell:
                     screen.blit(text, text_rect)
         else:
             pygame.draw.rect(screen, DARK_GRAY if self.is_flagged else GRAY, rect)
-            
+        
+        pygame.draw.rect(screen, BLACK, rect, 1)
+    
+    def toggle_flag(self):
+        if not self.is_revealed:
+            self.is_flagged = not self.is_flagged
+    
+    def reveal(self):
+        if not self.is_flagged:
+            self.is_revealed = True
+            return self.is_mine
+        return False
