@@ -60,9 +60,9 @@ class Grid :
                     return False
     
     def reveal_all_mines(self):
-        for row in self.cells
-            for cell in row:
-                if cell.mine:
+        for row in self.cells :
+            for cell in row :
+                if cell.mine :
                     cell.reveal()
     
     def draw(self, screen):
