@@ -35,11 +35,11 @@ class Grid :
                         count += 1
         return count
     
-    def reveald_cell(self, x, y):
+    def revealed_cell(self, x, y):
         if not self.mines_place :
             self.place_mines(x, y)
             self.mines_place = True
-        if self.cells[x][y].mines_around == 0 :
+        if self.cells[x][y].mines_arround == 0 :
             self.reveal_adjacent(x, y)
         return False
     
@@ -49,9 +49,10 @@ class Grid :
                 nx, ny = x + dx, y + dy
                 if 0 <= nx < self.cell_num and 0 <= ny < self.cell_num :
                     if not self.cells[nx][ny].revealed and not self.cells[nx][ny].mine :
-                        self.cells[nx][ny].reveal()
-                        if self.cells[nx][ny].mines_around == 0 :
+                        self.cells[nx][ny].revealed = True
+                        if self.cells[nx][ny].mines_arround == 0 :
                             self.reveal_adjacent(nx, ny)
+
 
     def check_win_condition(self):
         for row in self.cells :

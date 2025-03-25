@@ -34,8 +34,8 @@ class Cell :
         if not self.revealed :
             self.flagged = not self.flagged
 
-    def reveald(self):
+    def revealed(self):
         if not self.flagged :
-            self.reveald = True
+            self.revealed = True
             return self.mine
         return False
