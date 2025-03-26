@@ -1,72 +1,87 @@
 import random
-from models.cell import Cell
+import time
 
-class Grid :
-    def __init__(self, width, height, cell_size, cell_num, mines_count, shift):
-        self.width = width
-        self.height = height
-        self.cell_size = cell_size
-        self.cell_num = cell_num
-        self.mines_count = mines_count
-        self.shift = shift
-        self.cells = [[Cell(x, y, self.cell_size, self.shift) for y in range(0, self.cell_num)] for x in range (0, self.cell_num)]
-        self.mines_place = False
+class Board:
+    def __init__(self, rows=9, cols=9, mines=10):
+        self.rows = rows
+        self.cols = cols
+        self.mines = mines
+        self.grid = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.revealed = [[False for _ in range(cols)] for _ in range(rows)]
+        self.cell_states = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.game_over = False
+        self.win = False
+        self.start_time = None
+        self.elapsed_time = 0
+        self.first_click = True
+        self.start_time = time.time()
+        self.paused_time = 0
+        self.game_started = True
+        self.generate_board()
 
-    def place_mines(self, safe_x, safe_y):
-        mines_to_place = self.mines_count
-        while mines_to_place > 0 :
-            x = random.randint(0, self.cell_num -1)
-            y = random.randint(0, self.cell_num - 1)
-            if (x, y) != (safe_x, safe_y) and not self.cells[x][y].mine :
-                self.cells[x][y].mine = True
-                mines_to_place -= 1
+    def get_elapsed_time(self):
+        if self.game_started and not self.game_over and not self.win:
+            return int(time.time() - self.start_time - self.paused_time)
+        return int(self.paused_time)
+    
+    def start_timer(self):
+        if self.first_click:
+            self.start_time = time.time()
+            self.first_click = False
 
-        for x in range(self.cell_num):
-            for y in range(self.cell_num):
-                self.cells[x][y].mines_arround = self.count_mines_around(x, y)
-
-    def count_mines_around(self, x, y):
+    def get_current_time(self):
+        if self.start_time is None:
+            return 0
+        if self.game_over or self.win:
+            return self.elapsed_time
+        self.elapsed_time = int(time.time() - self.start_time)
+        return self.elapsed_time
+    
+    def generate_board(self):
+        mines_placed = 0
+        while mines_placed < self.mines:
+            row = random.randint(0, self.rows - 1)
+            col = random.randint(0, self.cols - 1)
+            if self.grid[row][col] != -1:
+                self.grid[row][col] = -1
+                mines_placed += 1
+        
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.grid[row][col] != -1:
+                    self.grid[row][col] = self.count_adjacent_mines(row, col)
+    
+    def count_adjacent_mines(self, row, col):
         count = 0
-        for dx in range(-1, 2):
-            for dy in range(-1, 2):
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < self.cell_num and 0 <= ny < self.cell_num :
-                    if self.cells[nx][ny].mine :
-                        count += 1
+        for r in range(max(0, row-1), min(self.rows, row+2)):
+            for c in range(max(0, col-1), min(self.cols, col+2)):
+                if self.grid[r][c] == -1:
+                    count += 1
         return count
     
-    def revealed_cell(self, x, y):
-        if not self.mines_place :
-            self.place_mines(x, y)
-            self.mines_place = True
-        if self.cells[x][y].mines_arround == 0 :
-            self.reveal_adjacent(x, y)
-        return False
+    def reveal(self, row, col):
+        if self.cell_states[row][col] == 1:
+            return
+        
+        self.revealed[row][col] = True
+        if self.grid[row][col] == 0:
+            for r in range(max(0, row-1), min(self.rows, row+2)):
+                for c in range(max(0, col-1), min(self.cols, col+2)):
+                    if not self.revealed[r][c] and self.cell_states[r][c] != 1:
+                        self.reveal(r, c)
     
-    def reveal_adjacent(self, x, y):
-        for dx in range(-1, 2):
-            for dy in range(-1, 2):
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < self.cell_num and 0 <= ny < self.cell_num :
-                    if not self.cells[nx][ny].revealed and not self.cells[nx][ny].mine :
-                        self.cells[nx][ny].revealed = True
-                        if self.cells[nx][ny].mines_arround == 0 :
-                            self.reveal_adjacent(nx, ny)
-
-
-    def check_win_condition(self):
-        for row in self.cells :
-            for cell in row :
-                if not cell.mine and not cell.revealed:
+    def toggle_flag(self, row, col):
+        if not self.revealed[row][col]:
+            self.cell_states[row][col] = (self.cell_states[row][col] + 1) % 3
+    
+    def get_remaining_mines(self):
+        flagged = sum(1 for row in self.cell_states for state in row if state == 1)
+        return self.mines - flagged
+    
+    def check_win(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if (self.grid[row][col] == -1 and self.cell_states[row][col] != 1) or \
+                   (self.grid[row][col] != -1 and not self.revealed[row][col]):
                     return False
-    
-    def reveal_all_mines(self):
-        for row in self.cells :
-            for cell in row :
-                if cell.mine :
-                    cell.reveal()
-    
-    def draw(self, screen):
-        for row in self.cells :
-            for cell in row :
-                cell.draw(screen)
+        return True
