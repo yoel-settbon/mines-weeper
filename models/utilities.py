@@ -8,7 +8,6 @@ class UI:
         self.top_offset = 80
         self.left_offset = 10
         
-        # Couleurs
         self.colors = {
             "hidden": (192, 192, 192),
             "revealed": (200, 200, 200),
@@ -31,14 +30,6 @@ class UI:
         }
         
         self.font = pygame.font.SysFont("Arial", 20)
-        self.smiley_font = pygame.font.SysFont("Arial", 30)
-
-        self.smiley_rect = pygame.Rect(
-            self.left_offset + (self.board.cols * self.cell_size) // 2 - 15,
-            20,
-            30,
-            30
-        )
     
     def draw(self):
         self.draw_top_panel()
@@ -63,30 +54,6 @@ class UI:
         remaining = self.board.get_remaining_mines()
         self.draw_counter(remaining, self.left_offset + 10, 20)
         
-        pygame.draw.rect(
-            self.screen,
-            (192, 192, 192),
-            self.smiley_rect
-        )
-        pygame.draw.rect(
-            self.screen,
-            self.colors["border_light"],
-            self.smiley_rect,
-            2
-        )
-        pygame.draw.rect(
-            self.screen,
-            self.colors["border_dark"],
-            self.smiley_rect.inflate(-4, -4),
-            2
-        )
-        
-        smiley_text = self.smiley_font.render("😊", True, (0, 0, 0))
-        self.screen.blit(
-            smiley_text,
-            (self.smiley_rect.centerx - smiley_text.get_width() // 2,
-             self.smiley_rect.centery - smiley_text.get_height() // 2)
-        )
     
     def draw_counter(self, value, x, y):
         counter_rect = pygame.Rect(x, y, 50, 30)
@@ -218,3 +185,4 @@ class UI:
             row = (y - self.top_offset) // self.cell_size
             return row, col
         return None
+    

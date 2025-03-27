@@ -70,6 +70,12 @@ class Board:
                     if not self.revealed[r][c] and self.cell_states[r][c] != 1:
                         self.reveal(r, c)
     
+    def reveal_all_mines(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                if self.grid[row][col] == -1:
+                    self.revealed[row][col] = True
+       
     def toggle_flag(self, row, col):
         if not self.revealed[row][col]:
             self.cell_states[row][col] = (self.cell_states[row][col] + 1) % 3

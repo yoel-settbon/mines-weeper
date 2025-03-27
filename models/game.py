@@ -1,13 +1,14 @@
 import pygame
 from models.grid import Board
 from models.utilities import UI
+from models.popup import Popup
 
 class Game:
     def __init__(self):
         self.width = 300
         self.height = 400
         self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Démineur")
+        pygame.display.set_caption("Mines Weeper")
         
         self.board = Board(rows=9, cols=9, mines=10)
         self.ui = UI(self.screen, self.board)
@@ -15,27 +16,42 @@ class Game:
         
         self.game_over = False
         self.win = False
+        self.popup = None 
 
     def run(self):
+        
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 
-                if not self.game_over and not self.win:
+                if self.popup:
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        if event.button == 1:  # Clic gauche
-                            self.handle_left_click(event.pos)
-                        elif event.button == 3:  # Clic droit
-                            self.handle_right_click(event.pos)
-                
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_r:
-                        self.__init__()
+                        result = self.popup.handle_click(event.pos)
+                        if result == "restart":
+                            self.__init__()
+                            continue
+                        elif result == "quit":
+                            running = False
+                else: 
+                    if not self.game_over and not self.win:
+                        if event.type == pygame.MOUSEBUTTONDOWN:
+                            if event.button == 1:
+                                self.handle_left_click(event.pos)
+                            elif event.button == 3:
+                                self.handle_right_click(event.pos)
             
             self.screen.fill((192, 192, 192))
             self.ui.draw()
+            
+            if (self.board.game_over or self.board.win) and not self.popup:
+                message = "You WIN !" if self.board.win else "You LOSE !"
+                self.popup = Popup(self.screen, message)
+            
+            if self.popup:
+                self.popup.draw()
+            
             pygame.display.flip()
             self.clock.tick(30)
     
@@ -47,7 +63,7 @@ class Game:
                 self.board.reveal(row, col)
                 if self.board.grid[row][col] == -1:
                     self.board.game_over = True
-                    self.reveal_all_mines()
+                    self.board.reveal_all_mines()
                 elif self.board.check_win():
                     self.board.win = True
     
