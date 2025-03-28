@@ -14,16 +14,17 @@ class Board:
         self.start_time = None
         self.elapsed_time = 0
         self.first_click = True
-        self.start_time = time.time()
         self.paused_time = 0
-        self.game_started = True
+        self.game_started = False
         self.generate_board()
 
     def get_elapsed_time(self):
-        if self.game_started and not self.game_over and not self.win:
-            return int(time.time() - self.start_time - self.paused_time)
-        return int(self.paused_time)
-    
+        if not self.game_started:
+            return 0
+        if self.game_over or self.win:
+            return self.elapsed_time
+        return int(time.time() - self.start_time - self.paused_time)
+        
     def start_timer(self):
         if self.first_click:
             self.start_time = time.time()
@@ -60,6 +61,12 @@ class Board:
         return count
     
     def reveal(self, row, col):
+        if self.first_click:
+            self.first_click = False
+            self.game_started = True
+            self.start_time = time.time()
+            self.generate_board()
+        
         if self.cell_states[row][col] == 1:
             return
         
@@ -69,6 +76,10 @@ class Board:
                 for c in range(max(0, col-1), min(self.cols, col+2)):
                     if not self.revealed[r][c] and self.cell_states[r][c] != 1:
                         self.reveal(r, c)
+        
+        if self.grid[row][col] == -1:
+            self.game_over = True
+            self.reveal_all_mines()
     
     def reveal_all_mines(self):
         for row in range(self.rows):
