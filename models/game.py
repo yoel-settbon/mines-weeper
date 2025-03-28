@@ -58,6 +58,9 @@ class Game:
     def handle_left_click(self, pos):
         cell = self.ui.get_cell_from_pos(pos)
         if cell:
+            
+            self.board.start_timer()
+            
             row, col = cell
             if not self.board.revealed[row][col] and self.board.cell_states[row][col] != 1:
                 self.board.reveal(row, col)
@@ -71,6 +74,9 @@ class Game:
         if not self.game_over and not self.win:
             cell = self.ui.get_cell_from_pos(pos)
             if cell:
+                
+                self.board.start_timer()
+                
                 row, col = cell
                 if not self.board.revealed[row][col]:
                     self.board.toggle_flag(row, col)

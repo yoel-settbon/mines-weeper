@@ -14,20 +14,22 @@ class Board:
         self.start_time = None
         self.elapsed_time = 0
         self.first_click = True
-        self.start_time = time.time()
         self.paused_time = 0
-        self.game_started = True
+        self.game_started = False
         self.generate_board()
 
     def get_elapsed_time(self):
+        if not self.game_started:
+            return 0
         if self.game_started and not self.game_over and not self.win:
             return int(time.time() - self.start_time - self.paused_time)
-        return int(self.paused_time)
+        return int(self.elapsed_time)
     
     def start_timer(self):
         if self.first_click:
             self.start_time = time.time()
             self.first_click = False
+            self.game_started = True
 
     def get_current_time(self):
         if self.start_time is None:
