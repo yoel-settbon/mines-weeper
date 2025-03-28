@@ -28,7 +28,6 @@ class Popup:
             button_width,
             24
         )
-
         self.icon = pygame.Surface((40, 40), pygame.SRCALPHA)
         if "Win" in message :
             pygame.draw.circle(self.icon, (0, 200, 0), (20, 20), 18)
