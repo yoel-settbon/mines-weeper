@@ -1,11 +1,11 @@
 import pygame
 
 class Popup:
-    def __init__(self, screen, message):
+    def __init__(self, screen, message, show_menu_button=False):
         self.screen = screen
         self.message = message
         self.width = 300
-        self.height = 150
+        self.height = 180 if show_menu_button else 150  # Plus grand si on a le bouton menu
         self.rect = pygame.Rect(
             (screen.get_width() - self.width) // 2,
             (screen.get_height() - self.height) // 2,
@@ -15,28 +15,58 @@ class Popup:
         self.font_large = pygame.font.SysFont('Arial', 24, bold=True)
         self.font_small = pygame.font.SysFont('Arial', 14)
         
-        button_width = 100
-        self.restart_button = pygame.Rect(
-            self.rect.x + 30,
-            self.rect.y + 100,
-            button_width,
-            24
-        )
-        self.quit_button = pygame.Rect(
-            self.rect.x + 170,
-            self.rect.y + 100,
-            button_width,
-            24
-        )
-        self.icon = pygame.Surface((40, 40), pygame.SRCALPHA)
-        if "Win" in message :
-            pygame.draw.circle(self.icon, (0, 200, 0), (20, 20), 18)
-            pygame.draw.line(self.icon, (255, 255, 255), (12, 20), (18, 26), 4)
-            pygame.draw.line(self.icon, (255, 255, 255), (18, 26), (28, 14), 4)
+        button_width = 80
+        button_height = 24
+        
+        # Ajuster les positions si on a le bouton menu
+        if show_menu_button:
+            self.restart_button = pygame.Rect(
+                self.rect.x + 20,
+                self.rect.y + 100,
+                button_width,
+                button_height
+            )
+            self.menu_button = pygame.Rect(
+                self.rect.x + (self.width - button_width) // 2,
+                self.rect.y + 100,
+                button_width,
+                button_height
+            )
+            self.quit_button = pygame.Rect(
+                self.rect.x + self.width - 20 - button_width,
+                self.rect.y + 100,
+                button_width,
+                button_height
+            )
         else:
-            pygame.draw.circle(self.icon, (200, 0, 0), (20, 20), 18)
-            pygame.draw.line(self.icon, (255, 255, 255), (12, 12), (28, 28), 4)
-            pygame.draw.line(self.icon, (255, 255, 255), (28, 12), (12, 28), 4)
+            self.restart_button = pygame.Rect(
+                self.rect.x + 30,
+                self.rect.y + 100,
+                button_width,
+                button_height
+            )
+            self.quit_button = pygame.Rect(
+                self.rect.x + 170,
+                self.rect.y + 100,
+                button_width,
+                button_height
+            )
+            self.menu_button = None
+        
+        self.show_menu_button = show_menu_button
+        
+        self.icon = None
+        if "WIN" in message.upper():
+            self.icon = pygame.Surface((32, 32), pygame.SRCALPHA)
+            pygame.draw.circle(self.icon, (255, 255, 0), (16, 16), 15)
+            pygame.draw.circle(self.icon, (0, 0, 0), (10, 12), 3)
+            pygame.draw.circle(self.icon, (0, 0, 0), (22, 12), 3)
+            pygame.draw.arc(self.icon, (0, 0, 0), (8, 10, 16, 16), 3.14, 6.28, 2)
+        else:
+            self.icon = pygame.Surface((32, 32), pygame.SRCALPHA)
+            pygame.draw.circle(self.icon, (255, 0, 0), (16, 16), 15)
+            pygame.draw.line(self.icon, (255, 255, 255), (10, 10), (22, 22), 3)
+            pygame.draw.line(self.icon, (255, 255, 255), (22, 10), (10, 22), 3)
     
     def draw(self):
         s = pygame.Surface((self.screen.get_width(), self.screen.get_height()), pygame.SRCALPHA)
@@ -53,20 +83,21 @@ class Popup:
         pygame.draw.line(self.screen, (255, 255, 255), (self.rect.x, self.rect.y), (self.rect.x, self.rect.bottom), 2)
         pygame.draw.line(self.screen, (128, 128, 128), (self.rect.x, self.rect.bottom), (self.rect.right, self.rect.bottom), 2)
         pygame.draw.line(self.screen, (128, 128, 128), (self.rect.right, self.rect.y), (self.rect.right, self.rect.bottom), 2) 
-        
         title_text = self.font_small.render("Mines Weeper", True, (255, 255, 255))
         self.screen.blit(title_text, (self.rect.x + 5, self.rect.y + 3))
         
         if self.icon:
-            self.screen.blit(self.icon, (self.rect.x + 20, self.rect.y + 35))
+            self.screen.blit(self.icon, (self.rect.x + 15, self.rect.y + 35))
         
         text_lines = [self.message[i:i+30] for i in range(0, len(self.message), 30)]
         for i, line in enumerate(text_lines):
             text = self.font_small.render(line, True, (0, 0, 0))
-            self.screen.blit(text, (self.rect.x + 70, self.rect.y + 40 + i * 20))
+            self.screen.blit(text, (self.rect.x + 60, self.rect.y + 40 + i * 20))
         
         self.draw_button(self.restart_button, "Retry")
         self.draw_button(self.quit_button, "Quit")
+        if self.show_menu_button and self.menu_button:
+            self.draw_button(self.menu_button, "Menu")
     
     def draw_button(self, rect, text):
         pygame.draw.rect(self.screen, (128, 128, 128), rect, 1)
@@ -82,7 +113,7 @@ class Popup:
         self.screen.blit(text_surface, text_rect)
 
     def check_hover(self, pos):
-        if self.restart_button.collidepoint(pos) or self.quit_button.collidepoint(pos):
+        if self.restart_button.collidepoint(pos) or self.quit_button.collidepoint(pos) or (self.menu_button and self.menu_button.collidepoint(pos)):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
             return True
         else:
@@ -96,4 +127,7 @@ class Popup:
         elif self.quit_button.collidepoint(pos):
             pygame.time.delay(100)
             return "quit"
+        elif self.menu_button and self.menu_button.collidepoint(pos):
+            pygame.time.delay(100)
+            return "menu"
         return None
