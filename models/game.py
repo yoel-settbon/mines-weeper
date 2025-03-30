@@ -65,6 +65,7 @@ class Game:
                     self.board.game_over = True
                     self.board.reveal_all_mines()
                 elif self.board.check_win():
+                    print(self.board.elapsed_time())
                     self.board.win = True
     
     def handle_right_click(self, pos):
