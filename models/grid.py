@@ -19,24 +19,18 @@ class Board:
         self.generate_board()
 
     def get_elapsed_time(self):
-        if not self.game_started:
+        if self.start_time is None:
             return 0
         if self.game_over or self.win:
             return self.elapsed_time
-        return int(time.time() - self.start_time - self.paused_time)
+        self.elapsed_time = int(time.time() - self.start_time - self.paused_time)
+        return self.elapsed_time
         
     def start_timer(self):
         if self.first_click:
             self.start_time = time.time()
             self.first_click = False
-
-    def get_current_time(self):
-        if self.start_time is None:
-            return 0
-        if self.game_over or self.win:
-            return self.elapsed_time
-        self.elapsed_time = int(time.time() - self.start_time)
-        return self.elapsed_time
+            self.game_started = True
     
     def generate_board(self):
         mines_placed = 0
@@ -62,10 +56,8 @@ class Board:
     
     def reveal(self, row, col):
         if self.first_click:
-            self.first_click = False
-            self.game_started = True
-            self.start_time = time.time()
-            self.generate_board()
+            # Ici, on ne génère plus le plateau, mais on démarre simplement le timer
+            self.start_timer()
         
         if self.cell_states[row][col] == 1:
             return

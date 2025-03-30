@@ -15,13 +15,11 @@ class Game:
         self.ui = UI(self.screen, self.board)
         self.clock = pygame.time.Clock()
         
-
         self.game_over = False
         self.win = False
         self.popup = None
         self.player_name = player_name
         self.score_manager = ScoreManager()
-        
         
         self.return_to_menu = False
 
@@ -31,41 +29,43 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    self.return_to_menu = False
                 
                 if self.popup:
+
+                    if event.type == pygame.MOUSEMOTION:
+                        self.popup.check_hover(event.pos)
+                        
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         result = self.popup.handle_click(event.pos)
                         if result == "restart":
+
                             self.__init__(self.player_name)
-                            continue
                         elif result == "quit":
-                           
-                            self.return_to_menu = True
-                            break
+
+                            running = False
+                            self.return_to_menu = False
                         elif result == "menu":
+
+                            running = False
                             self.return_to_menu = True
-                            break
                 else: 
                     if not self.game_over and not self.win:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            if event.button == 1:
+                            if event.button == 1:  # Clic gauche
                                 self.handle_left_click(event.pos)
-                            elif event.button == 3:
+                            elif event.button == 3:  # Clic droit
                                 self.handle_right_click(event.pos)
             
             self.screen.fill((192, 192, 192))
             self.ui.draw()
             
-          
             if (self.board.game_over or self.board.win) and not self.popup:
-          
                 if self.board.win:
                     final_time = self.board.get_elapsed_time()
-             
                     is_high_score = self.score_manager.is_high_score(final_time)
                     
                     if is_high_score:
-                   
                         self.score_manager.add_score(self.player_name, final_time)
                         message = f"You WIN! Your time: {final_time} seconds. New high score!"
                     else:
@@ -73,7 +73,6 @@ class Game:
                 else:
                     message = "You LOSE!"
                 
-
                 self.popup = Popup(self.screen, message, show_menu_button=True)
             
             if self.popup:

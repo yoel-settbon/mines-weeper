@@ -49,7 +49,7 @@ class UI:
         
         time_text = self.font.render(f"Temps: {str(minutes).zfill(2)}:{str(secondes).zfill(2)}", 
                                    True, (0, 0, 0))
-        self.screen.blit(time_text, (self.screen.get_width() // 1.25 - 50, 20))
+        self.screen.blit(time_text, (self.screen.get_width() // 2 + 10, 20))
         
         remaining = self.board.get_remaining_mines()
         self.draw_counter(remaining, self.left_offset + 10, 20)

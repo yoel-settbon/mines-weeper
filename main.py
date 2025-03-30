@@ -5,17 +5,17 @@ from models.main_menu import MainMenu
 def main():
     pygame.init()
     
-    # Initialiser le menu principal
+    # Initialiser l'écran
     screen = pygame.display.set_mode((300, 400))
     pygame.display.set_caption("Mines Weeper")
     
     # Boucle principale
     running = True
     
-    # Créer le menu principal
-    menu = MainMenu(screen)
-    
     while running:
+        # Créer le menu principal (nouvelle instance à chaque fois)
+        menu = MainMenu(screen)
+        
         # Afficher le menu principal 
         player_name, should_start = menu.run()
         
@@ -27,7 +27,7 @@ def main():
             # Exécuter le jeu
             return_to_menu = game.run()
             
-            # Si le jeu est terminé, retourner au menu principal
+            # Continuer la boucle si on doit retourner au menu
             if not return_to_menu:
                 running = False
         else:
