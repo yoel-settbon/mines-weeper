@@ -4,9 +4,22 @@ class UI:
     def __init__(self, screen, board):
         self.screen = screen
         self.board = board
-        self.cell_size = 30
+        screen_width, screen_height = screen.get_size()
+        max_grid_width = screen_width - 20  # 10px de marge de chaque côté
+        max_grid_height = screen_height - 100  # 80px pour le panel du haut + 20px de marge
+        
+        # Calculer la taille optimale des cellules
+        self.cell_size = min(
+            max_grid_width // self.board.cols,
+            max_grid_height // self.board.rows
+        )
+        
+        # Calculer les offsets pour centrer la grille
+        total_grid_width = self.board.cols * self.cell_size
+        total_grid_height = self.board.rows * self.cell_size
+        
+        self.left_offset = (screen_width - total_grid_width) // 2
         self.top_offset = 80
-        self.left_offset = 10
         
         self.colors = {
             "hidden": (192, 192, 192),

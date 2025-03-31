@@ -17,12 +17,12 @@ def main():
         menu = MainMenu(screen)
         
         # Afficher le menu principal 
-        player_name, should_start = menu.run()
+        player_name, should_start, difficulty = menu.run()
         
         # Si l'utilisateur a cliqué sur "Jouer", démarrer une partie
         if should_start:
             # Créer et démarrer le jeu avec le nom du joueur
-            game = Game(player_name)
+            game = Game(player_name, difficulty)
             
             # Exécuter le jeu
             return_to_menu = game.run()

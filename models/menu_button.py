@@ -8,9 +8,14 @@ class MenuButton:
         self.bg_color = (192, 192, 192)
         self.text_color = (0, 0, 0)
         self.hovered = False
+        self.highlight = False
         
     def draw(self, screen):
         pygame.draw.rect(screen, self.bg_color, self.rect)
+        if self.highlight:
+            pygame.draw.rect(screen, (160, 160, 220), self.rect)
+        else:
+            pygame.draw.rect(screen, self.bg_color, self.rect)
         
         if self.hovered:
             pygame.draw.line(screen, (128, 128, 128), (self.rect.x, self.rect.y), (self.rect.right-1, self.rect.y), 2)

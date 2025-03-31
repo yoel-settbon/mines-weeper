@@ -5,13 +5,23 @@ from models.popup import Popup
 from models.score_manager import ScoreManager
 
 class Game:
-    def __init__(self, player_name="Player"):
+    def __init__(self, player_name="Player", difficulty="Facile"):
         self.width = 300
         self.height = 400
+        if difficulty == "Facile":
+            rows, cols, mines = 9, 9, 10
+            self.width, self.height = 300, 400
+        elif difficulty == "Moyen":
+            rows, cols, mines = 16, 16, 40
+            self.width, self.height = 520, 600
+        elif difficulty == "Difficile":
+            rows, cols, mines = 16, 30, 99
+            self.width, self.height = 920, 600
+
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Mines Weeper")
     
-        self.board = Board(rows=9, cols=9, mines=10)
+        self.board = Board(rows=rows, cols=cols, mines=mines)
         self.ui = UI(self.screen, self.board)
         self.clock = pygame.time.Clock()
         
@@ -20,6 +30,7 @@ class Game:
         self.popup = None
         self.player_name = player_name
         self.score_manager = ScoreManager()
+        self.difficulty = difficulty
         
         self.return_to_menu = False
 
@@ -32,21 +43,17 @@ class Game:
                     self.return_to_menu = False
                 
                 if self.popup:
-
                     if event.type == pygame.MOUSEMOTION:
                         self.popup.check_hover(event.pos)
                         
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         result = self.popup.handle_click(event.pos)
                         if result == "restart":
-
-                            self.__init__(self.player_name)
+                            self.__init__(self.player_name, self.difficulty)
                         elif result == "quit":
-
                             running = False
                             self.return_to_menu = False
                         elif result == "menu":
-
                             running = False
                             self.return_to_menu = True
                 else: 
@@ -63,10 +70,10 @@ class Game:
             if (self.board.game_over or self.board.win) and not self.popup:
                 if self.board.win:
                     final_time = self.board.get_elapsed_time()
-                    is_high_score = self.score_manager.is_high_score(final_time)
+                    is_high_score = self.score_manager.is_high_score(final_time, self.difficulty)
                     
                     if is_high_score:
-                        self.score_manager.add_score(self.player_name, final_time)
+                        self.score_manager.add_score(self.player_name, final_time, self.difficulty)
                         message = f"You WIN! Your time: {final_time} seconds. New high score!"
                     else:
                         message = f"You WIN! Your time: {final_time} seconds."
