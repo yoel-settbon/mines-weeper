@@ -130,8 +130,6 @@ class MainMenu:
         self.input_box.draw(self.screen)
         self.play_button.draw(self.screen)
         
-
-        
         # Dessiner les boutons de difficulté
         for i, button in enumerate(self.difficulty_buttons):
             # Mettre en surbrillance le bouton sélectionné
