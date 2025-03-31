@@ -24,7 +24,7 @@ class MainMenu:
         button_width = 150
         button_height = 40
         
-        # Input box pour le nom du joueur
+        # Input box pour for player's name
         self.input_box = InputBox(
             x=(self.width - input_width) // 2,
             y=120,
@@ -33,7 +33,7 @@ class MainMenu:
             placeholder="Entrez votre nom"
         )
         
-        # Bouton Jouer
+        # Player Button
         self.play_button = MenuButton(
             x=(self.width - button_width) // 2,
             y=170,
@@ -42,7 +42,7 @@ class MainMenu:
             text="Jouer"
         )
         
-        # Boutons de difficulté (en horizontal)
+        # Difficulty Button
         small_button_width = 80
         small_button_height = 30
         button_spacing = 10
@@ -74,7 +74,7 @@ class MainMenu:
             )
         ]
         
-        # Niveau de difficulté par défaut
+        # Default difficulty level
         self.selected_difficulty = "Facile"
         
         self.score_manager = ScoreManager()
@@ -121,34 +121,33 @@ class MainMenu:
     def draw(self):
         self.screen.fill(self.bg_color)
         
-        # Titre du jeu
+        # title game
         title_text = self.title_font.render("Mines Weeper", True, self.text_color)
         title_rect = title_text.get_rect(center=(self.width // 2, 50))
         self.screen.blit(title_text, title_rect)
         
-        # Dessiner l'input box et le bouton jouer
+        # Draw input box and player button
         self.input_box.draw(self.screen)
         self.play_button.draw(self.screen)
-        
-        # Dessiner les boutons de difficulté
+        # Draw difficulty buttons
         for i, button in enumerate(self.difficulty_buttons):
-            # Mettre en surbrillance le bouton sélectionné
+            # Highlight the selected button
             if ["Facile", "Moyen", "Difficile"][i] == self.selected_difficulty:
-                # Si tu as ajouté l'attribut highlight à MenuButton
+                # If you have added the 'highlight' attribute to MenuButton
                 if hasattr(button, 'highlight'):
                     button.highlight = True
-                # Sinon, tu peux simplement changer la couleur du texte
+                # Otherwise, you can simply change the text color.
                 else:
-                    button.text_color = (0, 0, 255)  # Bleu pour le bouton sélectionné
+                    button.text_color = (0, 0, 255)
             else:
                 if hasattr(button, 'highlight'):
                     button.highlight = False
                 else:
-                    button.text_color = (0, 0, 0)  # Noir pour les autres boutons
+                    button.text_color = (0, 0, 0)
                     
             button.draw(self.screen)
         
-        # Afficher les scores
+        # Print scores
         self.draw_scores()
     
     def run(self):
@@ -173,7 +172,7 @@ class MainMenu:
                         should_start = True
                         self.running = False
                     
-                    # Vérifier les clics sur les boutons de difficulté
+                    # Check the clicks on the difficulty buttons
                     for i, button in enumerate(self.difficulty_buttons):
                         if button.check_click(event.pos):
                             self.selected_difficulty = ["Facile", "Moyen", "Difficile"][i]
@@ -181,7 +180,7 @@ class MainMenu:
             self.input_box.update()
             self.play_button.update(mouse_pos)
             
-            # Mettre à jour les boutons de difficulté
+            # Update the difficulty buttons
             for button in self.difficulty_buttons:
                 button.update(mouse_pos)
             

@@ -93,7 +93,6 @@ class Game:
         if cell:
             row, col = cell
             if not self.board.revealed[row][col] and self.board.cell_states[row][col] != 1:
-                # NE PAS appeler start_timer() ici !
                 self.board.reveal(row, col)
                 if self.board.grid[row][col] == -1:
                     self.board.game_over = True

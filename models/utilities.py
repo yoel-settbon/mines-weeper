@@ -5,22 +5,22 @@ class UI:
         self.screen = screen
         self.board = board
         screen_width, screen_height = screen.get_size()
-        max_grid_width = screen_width - 20  # 10px de marge de chaque côté
-        max_grid_height = screen_height - 100  # 80px pour le panel du haut + 20px de marge
-        
-        # Calculer la taille optimale des cellules
+        max_grid_width = screen_width - 20
+        max_grid_height = screen_height - 100
+
+        # Calculate the optimal cell size
         self.cell_size = min(
             max_grid_width // self.board.cols,
             max_grid_height // self.board.rows
         )
-        
-        # Calculer les offsets pour centrer la grille
+
+        # Calculate offsets to center the grid
         total_grid_width = self.board.cols * self.cell_size
         total_grid_height = self.board.rows * self.cell_size
-        
+
         self.left_offset = (screen_width - total_grid_width) // 2
         self.top_offset = 80
-        
+
         self.colors = {
             "hidden": (192, 192, 192),
             "revealed": (200, 200, 200),
@@ -41,13 +41,13 @@ class UI:
                 (128, 128, 128) 
             ]
         }
-        
+
         self.font = pygame.font.SysFont("Arial", 20)
-    
+
     def draw(self):
         self.draw_top_panel()
         self.draw_grid()
-    
+
     def draw_top_panel(self):
         pygame.draw.rect(
             self.screen, 
@@ -56,18 +56,17 @@ class UI:
         )
 
         elapsed_time = self.board.get_elapsed_time()
-        
+
         minutes = elapsed_time // 60
-        secondes = elapsed_time % 60
-        
-        time_text = self.font.render(f"Temps: {str(minutes).zfill(2)}:{str(secondes).zfill(2)}", 
-                                   True, (0, 0, 0))
+        seconds = elapsed_time % 60
+
+        time_text = self.font.render(f"Time: {str(minutes).zfill(2)}:{str(seconds).zfill(2)}", 
+                                     True, (0, 0, 0))
         self.screen.blit(time_text, (self.screen.get_width() // 2 + 10, 20))
-        
+
         remaining = self.board.get_remaining_mines()
         self.draw_counter(remaining, self.left_offset + 10, 20)
-        
-    
+
     def draw_counter(self, value, x, y):
         counter_rect = pygame.Rect(x, y, 50, 30)
         pygame.draw.rect(
@@ -80,28 +79,28 @@ class UI:
             (128, 128, 128),
             counter_rect.inflate(-4, -4)
         )
-        
+
         counter_text = self.font.render(f"{value:03d}", True, (255, 0, 0))
         self.screen.blit(
             counter_text,
             (counter_rect.centerx - counter_text.get_width() // 2,
              counter_rect.centery - counter_text.get_height() // 2)
         )
-    
+
     def draw_grid(self):
         for row in range(self.board.rows):
             for col in range(self.board.cols):
                 x = self.left_offset + col * self.cell_size
                 y = self.top_offset + row * self.cell_size
                 rect = pygame.Rect(x, y, self.cell_size, self.cell_size)
-                
+
                 if self.board.revealed[row][col]:
                     pygame.draw.rect(
                         self.screen,
                         self.colors["revealed"],
                         rect
                     )
-                    
+
                     if self.board.grid[row][col] == -1:
                         color = (255, 0, 0) if self.board.game_over else self.colors["mine"]
                         pygame.draw.circle(
@@ -121,7 +120,7 @@ class UI:
                             (rect.centerx - text.get_width() // 2,
                              rect.centery - text.get_height() // 2)
                         )
-                    
+
                     pygame.draw.rect(
                         self.screen,
                         self.colors["border_dark"],
@@ -134,7 +133,7 @@ class UI:
                         self.colors["hidden"],
                         rect
                     )
-                    
+
                     pygame.draw.line(
                         self.screen,
                         self.colors["border_light"],
@@ -163,7 +162,7 @@ class UI:
                         (x + self.cell_size - 1, y + self.cell_size - 1),
                         2
                     )
-                    
+
                     state = self.board.cell_states[row][col]
                     if state == 1:
                         pygame.draw.rect(
@@ -189,7 +188,7 @@ class UI:
                             text,
                             (rect.centerx - text.get_width() // 2,
                              rect.centery - text.get_height() // 2))
-    
+
     def get_cell_from_pos(self, pos):
         x, y = pos
         if (self.left_offset <= x < self.left_offset + self.board.cols * self.cell_size and
@@ -198,4 +197,3 @@ class UI:
             row = (y - self.top_offset) // self.cell_size
             return row, col
         return None
-    

@@ -5,9 +5,9 @@ class ScoreManager:
     def __init__(self, filename="scores.json"):
         self.filename = filename
         self.scores = {
-            "Facile": [],
-            "Moyen": [],
-            "Difficile": []
+            "Easy": [],
+            "Medium": [],
+            "Hard": []
         }
         self.load_scores()
     
@@ -16,37 +16,36 @@ class ScoreManager:
             try:
                 with open(self.filename, 'r') as file:
                     data = json.load(file)
-                    # Compatibilité avec l'ancien format
+                    # Compatibility with old format
                     if isinstance(data, list):
                         self.scores = {
-                            "Facile": data,
-                            "Moyen": [],
-                            "Difficile": []
+                            "Easy": data,
+                            "Medium": [],
+                            "Hard": []
                         }
                     else:
                         self.scores = data
             except (json.JSONDecodeError, FileNotFoundError):
-                # Initialisation par défaut
+                # Default initialization
                 self.scores = {
-                    "Facile": [],
-                    "Moyen": [],
-                    "Difficile": []
+                    "Easy": [],
+                    "Medium": [],
+                    "Hard": []
                 }
         else:
-            # Initialisation par défaut
+            # Default initialization
             self.scores = {
-                "Facile": [],
-                "Moyen": [],
-                "Difficile": []
+                "Easy": [],
+                "Medium": [],
+                "Hard": []
             }
             self.save_scores()
     
     def save_scores(self):
-
         with open(self.filename, 'w') as file:
             json.dump(self.scores, file)
     
-    def add_score(self, name, time, difficulty="Facile"):
+    def add_score(self, name, time, difficulty="Easy"):
         self.scores[difficulty].append({
             "name": name,
             "time": time
@@ -59,10 +58,10 @@ class ScoreManager:
         
         self.save_scores()
 
-    def get_top_scores(self, difficulty="Facile", limit=5):
+    def get_top_scores(self, difficulty="Easy", limit=5):
         return self.scores[difficulty][:limit]
 
-    def is_high_score(self, time, difficulty="Facile"):
+    def is_high_score(self, time, difficulty="Easy"):
         if len(self.scores[difficulty]) < 5:
             return True
         return time < self.scores[difficulty][-1]["time"]

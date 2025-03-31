@@ -29,12 +29,11 @@ class Board:
     def start_timer(self):
         if self.first_click:
             self.start_time = time.time()
-            # Ne modifie PAS first_click ici, on le fera dans reveal()
             self.game_started = True
 
     def generate_board(self, first_row, first_col):
         while True:
-            # Réinitialisation de la grille
+            # Reinitializes the grid
             self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
             positions = [
                 (r, c)
@@ -54,8 +53,7 @@ class Board:
                 for col in range(self.cols):
                     if self.grid[row][col] != -1:
                         self.grid[row][col] = self.count_adjacent_mines(row, col)
-
-            # Condition : la case cliquée doit être > 0 pour éviter le cascade complet
+            # The clicked case has to be > 0 to avoid the cascade
             if self.grid[first_row][first_col] > 0:
                 break
 
@@ -91,7 +89,7 @@ class Board:
             self.game_over = True
             self.reveal_all_mines()
 
-        # Vérifier la victoire après la révélation
+        # Check victory after revelation
         if not self.game_over:
             if self.check_win():
                 self.win = True
