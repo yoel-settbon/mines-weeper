@@ -6,8 +6,6 @@ from models.score_manager import ScoreManager
 
 class Game:
     def __init__(self, player_name="Player", difficulty="Facile"):
-        self.width = 300
-        self.height = 400
         if difficulty == "Facile":
             rows, cols, mines = 9, 9, 10
             self.width, self.height = 300, 400
@@ -59,9 +57,9 @@ class Game:
                 else: 
                     if not self.game_over and not self.win:
                         if event.type == pygame.MOUSEBUTTONDOWN:
-                            if event.button == 1:  # Clic gauche
+                            if event.button == 1:  # clic gauche
                                 self.handle_left_click(event.pos)
-                            elif event.button == 3:  # Clic droit
+                            elif event.button == 3:  # clic droit
                                 self.handle_right_click(event.pos)
             
             self.screen.fill((192, 192, 192))
@@ -93,23 +91,17 @@ class Game:
     def handle_left_click(self, pos):
         cell = self.ui.get_cell_from_pos(pos)
         if cell:
-            self.board.start_timer()
-            
             row, col = cell
             if not self.board.revealed[row][col] and self.board.cell_states[row][col] != 1:
+                # NE PAS appeler start_timer() ici !
                 self.board.reveal(row, col)
                 if self.board.grid[row][col] == -1:
                     self.board.game_over = True
                     self.board.reveal_all_mines()
-                elif self.board.check_win():
-                    self.board.win = True
-    
+
     def handle_right_click(self, pos):
-        if not self.game_over and not self.win:
-            cell = self.ui.get_cell_from_pos(pos)
-            if cell:
-                self.board.start_timer()
-                
-                row, col = cell
-                if not self.board.revealed[row][col]:
-                    self.board.toggle_flag(row, col)
+        cell = self.ui.get_cell_from_pos(pos)
+        if cell:
+            row, col = cell
+            if not self.board.revealed[row][col]:
+                self.board.toggle_flag(row, col)

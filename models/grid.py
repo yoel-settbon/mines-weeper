@@ -16,7 +16,7 @@ class Board:
         self.first_click = True
         self.paused_time = 0
         self.game_started = False
-        self.generate_board()
+        self.generated = False
 
     def get_elapsed_time(self):
         if self.start_time is None:
@@ -29,23 +29,36 @@ class Board:
     def start_timer(self):
         if self.first_click:
             self.start_time = time.time()
-            self.first_click = False
+            # Ne modifie PAS first_click ici, on le fera dans reveal()
             self.game_started = True
 
-    def generate_board(self):
-        mines_placed = 0
-        while mines_placed < self.mines:
-            row = random.randint(0, self.rows - 1)
-            col = random.randint(0, self.cols - 1)
-            if self.grid[row][col] != -1:
-                self.grid[row][col] = -1
-                mines_placed += 1
-        
-        for row in range(self.rows):
-            for col in range(self.cols):
-                if self.grid[row][col] != -1:
-                    self.grid[row][col] = self.count_adjacent_mines(row, col)
-    
+    def generate_board(self, first_row, first_col):
+        while True:
+            # Réinitialisation de la grille
+            self.grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+            positions = [
+                (r, c)
+                for r in range(self.rows)
+                for c in range(self.cols)
+                if not (r == first_row and c == first_col)
+            ]
+            random.shuffle(positions)
+
+            mines_placed = 0
+            for r, c in positions:
+                if mines_placed < self.mines:
+                    self.grid[r][c] = -1
+                    mines_placed += 1
+
+            for row in range(self.rows):
+                for col in range(self.cols):
+                    if self.grid[row][col] != -1:
+                        self.grid[row][col] = self.count_adjacent_mines(row, col)
+
+            # Condition : la case cliquée doit être > 0 pour éviter le cascade complet
+            if self.grid[first_row][first_col] > 0:
+                break
+
     def count_adjacent_mines(self, row, col):
         count = 0
         for r in range(max(0, row-1), min(self.rows, row+2)):
@@ -53,16 +66,21 @@ class Board:
                 if self.grid[r][c] == -1:
                     count += 1
         return count
-    
+
     def reveal(self, row, col):
         if self.first_click:
-            # Ici, on ne génère plus le plateau, mais on démarre simplement le timer
+            self.generate_board(row, col)
             self.start_timer()
-        
+            self.first_click = False
+
         if self.cell_states[row][col] == 1:
             return
         
+        if self.revealed[row][col]:
+            return
+
         self.revealed[row][col] = True
+
         if self.grid[row][col] == 0:
             for r in range(max(0, row-1), min(self.rows, row+2)):
                 for c in range(max(0, col-1), min(self.cols, col+2)):
@@ -72,7 +90,12 @@ class Board:
         if self.grid[row][col] == -1:
             self.game_over = True
             self.reveal_all_mines()
-    
+
+        # Vérifier la victoire après la révélation
+        if not self.game_over:
+            if self.check_win():
+                self.win = True
+
     def reveal_all_mines(self):
         for row in range(self.rows):
             for col in range(self.cols):
@@ -90,12 +113,8 @@ class Board:
     def check_win(self):
         for row in range(self.rows):
             for col in range(self.cols):
-                # Une case est une mine et n'est pas marquée avec un drapeau
-                # OU une case n'est pas une mine mais n'est pas révélée
                 if (self.grid[row][col] == -1 and self.cell_states[row][col] != 1) or \
-                (self.grid[row][col] != -1 and not self.revealed[row][col]):
+                   (self.grid[row][col] != -1 and not self.revealed[row][col]):
                     return False
-        
-        # Si on est arrivé jusqu'ici, toutes les conditions sont remplies
         self.win = True
         return True
