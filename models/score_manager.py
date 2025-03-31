@@ -27,7 +27,8 @@ class ScoreManager:
             json.dump(self.scores, file)
     
     def add_score(self, name, time):
-
+        print(f"Ajout du score : {name} - {time}")
+        
         self.scores.append({
             "name": name,
             "time": time

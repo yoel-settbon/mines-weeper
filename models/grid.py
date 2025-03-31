@@ -31,7 +31,7 @@ class Board:
             self.start_time = time.time()
             self.first_click = False
             self.game_started = True
-    
+
     def generate_board(self):
         mines_placed = 0
         while mines_placed < self.mines:
@@ -90,7 +90,12 @@ class Board:
     def check_win(self):
         for row in range(self.rows):
             for col in range(self.cols):
+                # Une case est une mine et n'est pas marquée avec un drapeau
+                # OU une case n'est pas une mine mais n'est pas révélée
                 if (self.grid[row][col] == -1 and self.cell_states[row][col] != 1) or \
-                   (self.grid[row][col] != -1 and not self.revealed[row][col]):
+                (self.grid[row][col] != -1 and not self.revealed[row][col]):
                     return False
+        
+        # Si on est arrivé jusqu'ici, toutes les conditions sont remplies
+        self.win = True
         return True
